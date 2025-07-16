@@ -27,10 +27,12 @@ export function createElement(vNode) {
   if (typeof vNode === "object" && typeof vNode.type === "string") {
     const { type, props, children } = vNode;
     const el = document.createElement(type);
-    const entries = Object.entries(props);
+    // props Falsy 값 일 경우 빈 객체 설정 > entries 빈 배열 되므로 for 문 동작 X
+    const entries = Object.entries(props || {});
     for (const [key, value] of entries) {
       el.setAttribute(key.toLowerCase() === "classname" ? "class" : key, value);
     }
+    // 자식 또한 부모와 동일하게
     if (children.length > 0) {
       for (const child of children) {
         el.appendChild(createElement(child));
