@@ -25,21 +25,31 @@ export function createElement(vNode) {
   // 4
   // 함수 컴포넌트는 이미 걸러짐
   if (typeof vNode === "object" && typeof vNode.type === "string") {
-    const { type, props, children } = vNode;
-    const el = document.createElement(type);
-    // props Falsy 값 일 경우 빈 객체 설정 > entries 빈 배열 되므로 for 문 동작 X
-    const entries = Object.entries(props || {});
-    for (const [key, value] of entries) {
-      el.setAttribute(key.toLowerCase() === "classname" ? "class" : key, value);
-    }
+    const el = document.createElement(vNode.type);
+    // 속성 업데이트
+    updateAttributes(el, vNode.props || {});
     // 자식 또한 부모와 동일하게
-    if (children.length > 0) {
-      for (const child of children) {
-        el.appendChild(createElement(child));
-      }
+    for (const child of vNode.children) {
+      el.appendChild(createElement(child));
     }
     return el;
   }
 }
 
-function updateAttributes($el, props) {}
+// element 생성 후 속성 update
+function updateAttributes($el, props) {
+  Object.entries(props).forEach(([attr, value]) => {
+    if (attr.startsWith("on") && typeof value === "function") {
+      const eventType = attr.toLowerCase().slice(2);
+      addEvent($el, eventType, value);
+    } else if (["checked", "disabled", "selected", "readOnly"].includes(attr)) {
+      $el[attr] = Boolean(value);
+    } else if (attr === "className") {
+      value ? $el.setAttribute("class", value) : $el.removeAttribute("class");
+    } else if (attr === "style" && typeof value === "object") {
+      Object.assign($el.style, value);
+    } else {
+      $el.setAttribute(attr, value);
+    }
+  });
+}
