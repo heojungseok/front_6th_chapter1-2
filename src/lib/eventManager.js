@@ -7,7 +7,7 @@ const delegatedMap = new WeakMap();
 // 변수 선언
 let eventRoot = null;
 // 이벤트 타입
-const DELEGATED_EVENTS = ["click", "input", "change", "keydown", "mouseover"];
+const DELEGATED_EVENTS = ["click", "input", "change", "keydown", "mouseover", "focus"];
 
 function handleDelegateEvent(event) {
   let currentElement = event.target;
